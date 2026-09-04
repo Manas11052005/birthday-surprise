@@ -1,30 +1,32 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { createSurprise } from '../lib/birthdayService.js'
-import PhoneShell from '../components/PhoneShell.jsx'
-import FloatingHearts from '../components/FloatingHearts.jsx'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { createSurprise } from "../lib/birthdayService.js";
+import PhoneShell from "../components/PhoneShell.jsx";
+import FloatingHearts from "../components/FloatingHearts.jsx";
 
 const MESSAGE_PLACEHOLDER = `Happy Birthday to someone truly special! 🎂
-You are such a sweet soul and I'm so grateful to have you in my life.`
+You are such a sweet soul and I'm so grateful to have you in my life.`;
 
 export default function CreatorPage() {
-  const [name, setName] = useState('')
-  const [message, setMessage] = useState('')
-  const navigate = useNavigate()
+  const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const canSubmit = name.trim().length > 0 && message.trim().length > 0
+  const canSubmit = name.trim().length > 0 && message.trim().length > 0;
 
   function handleSubmit(e) {
-    e.preventDefault()
-    if (!canSubmit) return
-    const id = createSurprise({ name, message })
-    navigate(`/share/${id}`)
+    e.preventDefault();
+    if (!canSubmit) return;
+
+    const id = createSurprise({ name, message });
+    navigate(`/share/${id}`);
   }
 
   return (
     <PhoneShell>
       <FloatingHearts count={8} />
+
       <div className="relative z-10 flex-1 flex flex-col px-6 pt-[calc(env(safe-area-inset-top)+40px)] pb-[calc(env(safe-area-inset-bottom)+32px)] overflow-y-auto no-scrollbar">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -33,9 +35,13 @@ export default function CreatorPage() {
           className="text-center mb-8"
         >
           <span className="text-4xl">🎂</span>
+
           <h1 className="mt-3 text-3xl font-semibold text-plum-800">
-            Create a Birthday<br />Surprise
+            Create a Birthday
+            <br />
+            Surprise
           </h1>
+
           <p className="mt-2 text-sm text-plum-700/70">
             A little animated card, made for one person, from you.
           </p>
@@ -49,9 +55,13 @@ export default function CreatorPage() {
           className="bg-white/80 backdrop-blur rounded-3xl shadow-soft p-5 space-y-5"
         >
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-plum-800 mb-1.5">
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold text-plum-800 mb-1.5"
+            >
               Birthday person's name
             </label>
+
             <input
               id="name"
               type="text"
@@ -64,9 +74,13 @@ export default function CreatorPage() {
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-semibold text-plum-800 mb-1.5">
+            <label
+              htmlFor="message"
+              className="block text-sm font-semibold text-plum-800 mb-1.5"
+            >
               Your birthday message
             </label>
+
             <textarea
               id="message"
               value={message}
@@ -92,5 +106,5 @@ export default function CreatorPage() {
         </p>
       </div>
     </PhoneShell>
-  )
+  );
 }
