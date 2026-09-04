@@ -1,38 +1,65 @@
-import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import { getSurprise } from '../lib/birthdayService.js'
-import PhoneShell from '../components/PhoneShell.jsx'
-import FloatingHearts from '../components/FloatingHearts.jsx'
-import ProgressIndicator from '../components/ProgressIndicator.jsx'
-import BirthdayIntro from '../components/BirthdayIntro.jsx'
-import ExcitementScreen from '../components/ExcitementScreen.jsx'
-import BalloonGame from '../components/BalloonGame.jsx'
-import CandleBlow from '../components/CandleBlow.jsx'
-import RoseBouquet from '../components/RoseBouquet.jsx'
-import Envelope from '../components/Envelope.jsx'
-import BirthdayLetter from '../components/BirthdayLetter.jsx'
-import NotFoundBirthday from './NotFoundBirthday.jsx'
+import { useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { getSurprise } from "../lib/birthdayService.js";
+import PhoneShell from "../components/PhoneShell.jsx";
+import FloatingHearts from "../components/FloatingHearts.jsx";
+import ProgressIndicator from "../components/ProgressIndicator.jsx";
+import BirthdayIntro from "../components/BirthdayIntro.jsx";
+import ExcitementScreen from "../components/ExcitementScreen.jsx";
+import BalloonGame from "../components/BalloonGame.jsx";
+import CandleBlow from "../components/CandleBlow.jsx";
+import RoseBouquet from "../components/RoseBouquet.jsx";
+import Envelope from "../components/Envelope.jsx";
+import BirthdayLetter from "../components/BirthdayLetter.jsx";
+import NotFoundBirthday from "./NotFoundBirthday.jsx";
 
-const STAGES = ['intro', 'excitement', 'balloons', 'candle', 'bouquet', 'envelope', 'letter']
+const STAGES = [
+  "intro",
+  "excitement",
+  "balloons",
+  "candle",
+  "bouquet",
+  "envelope",
+  "letter",
+];
 
 export default function BirthdayPage() {
-  const { id } = useParams()
-  const surprise = useMemo(() => getSurprise(id), [id])
-  const [stage, setStage] = useState('intro')
+  const { id } = useParams();
+  const surprise = useMemo(() => getSurprise(id), [id]);
+  const [stage, setStage] = useState("intro");
+  const audioRef = useRef(null);
 
-  if (!surprise) return <NotFoundBirthday />
+  if (!surprise) return <NotFoundBirthday />;
 
-  const { name, message } = surprise
+  const { name, message } = surprise;
+
+  function startMusic() {
+    if (!audioRef.current) {
+      audioRef.current = new Audio("/happy-birthday.mp3");
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.5;
+    }
+
+    audioRef.current.play().catch(() => {});
+  }
 
   function next() {
-    const idx = STAGES.indexOf(stage)
-    if (idx < STAGES.length - 1) setStage(STAGES[idx + 1])
+    startMusic();
+
+    const idx = STAGES.indexOf(stage);
+
+    if (idx < STAGES.length - 1) {
+      setStage(STAGES[idx + 1]);
+    }
   }
 
   return (
     <PhoneShell>
-      {stage !== 'letter' && <FloatingHearts count={stage === 'intro' ? 10 : 6} />}
+      {stage !== "letter" && (
+        <FloatingHearts count={stage === "intro" ? 10 : 6} />
+      )}
+
       <ProgressIndicator stage={stage} />
 
       <AnimatePresence mode="wait">
@@ -44,15 +71,23 @@ export default function BirthdayPage() {
           transition={{ duration: 0.35 }}
           className="relative flex-1 flex flex-col"
         >
-          {stage === 'intro' && <BirthdayIntro name={name} onContinue={next} />}
-          {stage === 'excitement' && <ExcitementScreen onContinue={next} />}
-          {stage === 'balloons' && <BalloonGame onComplete={next} />}
-          {stage === 'candle' && <CandleBlow onComplete={next} />}
-          {stage === 'bouquet' && <RoseBouquet name={name} onContinue={next} />}
-          {stage === 'envelope' && <Envelope onOpened={next} />}
-          {stage === 'letter' && <BirthdayLetter name={name} message={message} />}
+          {stage === "intro" && <BirthdayIntro name={name} onContinue={next} />}
+
+          {stage === "excitement" && <ExcitementScreen onContinue={next} />}
+
+          {stage === "balloons" && <BalloonGame onComplete={next} />}
+
+          {stage === "candle" && <CandleBlow onComplete={next} />}
+
+          {stage === "bouquet" && <RoseBouquet name={name} onContinue={next} />}
+
+          {stage === "envelope" && <Envelope onOpened={next} />}
+
+          {stage === "letter" && (
+            <BirthdayLetter name={name} message={message} />
+          )}
         </motion.div>
       </AnimatePresence>
     </PhoneShell>
-  )
+  );
 }
